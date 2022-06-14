@@ -1,4 +1,5 @@
 use macroquad::{prelude::*};
+use soloud::*;
 use std::vec::Vec;
 
 fn check_add_point(points: &mut Vec<Vec2>) {
@@ -24,13 +25,27 @@ fn move_player_character(mut x: f32, mut y:  f32) -> (f32, f32) {
     return (x, y);
 }
 
+fn is_jumping() -> bool {
+    if is_key_down(KeyCode::Space) {
+        return true;
+    }
+    return false;
+}
+
 #[macroquad::main("BasicShapes")]
 async fn main() {
     let texture = load_texture("assets/grigor.png").await.unwrap();
+    let background_sound = Soloud::default().unwrap(); 
+    let jump_sound = Soloud::default().unwrap(); 
+    let mut wav_background = audio::Wav::default();
+    let mut wav_jump = audio::Wav::default();
     let mut x = 50.0;
     let mut y = 50.0;
     let mut clicked_points = Vec::new();
-    
+    wav_background.load(&std::path::Path::new("assets/monkey-music.mp3")).unwrap();
+    background_sound.play(&wav_background);
+    wav_jump.load(&std::path::Path::new("assets/cartoon-jump.mp3")).unwrap();
+
     loop {
         clear_background(LIGHTGRAY);
         
@@ -39,6 +54,10 @@ async fn main() {
         }
         
         (x, y) = move_player_character(x, y);
+
+        if is_jumping() {
+            jump_sound.play(&wav_jump);
+        } 
 
         check_add_point(&mut clicked_points);
 

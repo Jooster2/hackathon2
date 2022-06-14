@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 macroquad = "0.3.16"
+soloud = { version = "1", default-features = false, features = ["alsa"] }
