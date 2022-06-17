@@ -11,6 +11,12 @@ struct Player {
     jump: i32
 }
 
+struct Tile {
+    x: f32,
+    y: f32,
+    isGround: bool
+}
+
 fn check_add_point(points: &mut Vec<Vec2>) {
     if is_mouse_button_released(MouseButton::Left) {
         let pos = mouse_position();
@@ -56,7 +62,7 @@ fn read_map() -> Vec<Vec<String>> {
     return map;
 }
 
-fn draw_map(map: Vec<Vec<String>>) {
+fn draw_map(map: &Vec<Vec<String>>) {
     let squares = 50 as f32;
     let square_size_width = screen_width() / squares;
     let square_size_height = screen_height() / squares;
@@ -73,9 +79,40 @@ fn draw_map(map: Vec<Vec<String>>) {
     }
 }
 
+fn draw_map_with_textures(map: &Vec<Vec<String>>, textures: &HashMap<&str, Texture2D> ) {
+    let squares = 50 as f32;
+    let square_size_width = screen_width() / squares;
+    let square_size_height = screen_height() / squares;
+
+    for i in 0..50 {
+        for j in 0..50 {
+            match map[j][i].as_str(){
+                "T"=>draw_texture(*textures.get("tree").unwrap(),j as f32*square_size_width , i as f32*square_size_height, WHITE),
+                "G"=>draw_texture(*textures.get("grass").unwrap(),j as f32*square_size_width , i as f32*square_size_height, WHITE),
+                "A"=>draw_texture(*textures.get("air").unwrap(),j as f32*square_size_width , i as f32*square_size_height, WHITE),
+                _=>print!(""),
+            }
+        }
+    }
+}
+/*
+fn load_map_textures()-> HashMap<&static str, Texture2D> {
+    let textures = HashMap::from([
+        ("grass", load_texture("assets/pictures/grass.png")),
+        ("tree", load_texture("assets/pictures/tree.png")),
+        ("air", load_texture("assets/pictures/air.png"))
+    ]);
+    return &textures;
+}
+ */
 #[macroquad::main("BasicShapes")]
 async fn main() {
     let texture = load_texture("assets/pictures/grigor.png").await.unwrap();
+    let textureAtlas = HashMap::from([
+        ("grass", load_texture("assets/pictures/grass.png").await.unwrap()),
+        ("tree", load_texture("assets/pictures/tree.png").await.unwrap()),
+        ("air", load_texture("assets/pictures/air.png").await.unwrap())
+    ]);
 
     let soundAtlas = HashMap::from([
         ("jump", load_sound("assets/cartoon-jump.wav").await.unwrap()),
@@ -96,7 +133,6 @@ async fn main() {
         if is_key_down(KeyCode::Escape) {
             break;
         }
-        
         player = move_player_character(player, &soundAtlas);
         
         if player.y >= ground_level && player.jump == -1 {
@@ -110,7 +146,7 @@ async fn main() {
         }
 
         ground_level = window::screen_height() - 60.0;
-        draw_map(map.clone());
+        draw_map_with_textures(&map, &textureAtlas);
 
         draw_texture(texture, player.x, player.y, WHITE);
         // draw_line(0.0, ground_level, window::screen_width(), ground_level, 1.0, GREEN);
