@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 macroquad = "0.3.16"
 soloud = "1.0.0"
+csv = "1.0"
