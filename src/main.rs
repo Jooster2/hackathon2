@@ -31,10 +31,10 @@ fn move_player_character(mut player: Player, sounds: &HashMap<&str, audio::Sound
         play_sound_once(*sounds.get("jump").unwrap());
         player.jump = 1;
         player.y -= 2.0;
-    } else if is_key_down(KeyCode::Space) && 0 < player.jump && player.jump < 20 {
+    } else if is_key_down(KeyCode::Space) && 0 < player.jump && player.jump < 40 {
         player.jump += 1;
         player.y -= 2.0;
-    } else if is_key_released(KeyCode::Space) || player.jump >= 20 {
+    } else if is_key_released(KeyCode::Space) || player.jump >= 40 {
         player.jump = -1;
     }
 
@@ -75,14 +75,14 @@ fn draw_map(map: Vec<Vec<String>>) {
 
 #[macroquad::main("BasicShapes")]
 async fn main() {
-    let texture = load_texture("assets/grigor.png").await.unwrap();
+    let texture = load_texture("assets/pictures/grigor.png").await.unwrap();
 
     let soundAtlas = HashMap::from([
         ("jump", load_sound("assets/cartoon-jump.wav").await.unwrap()),
         ("background", load_sound("assets/monkey-music.wav").await.unwrap())
     ]);
 
-    let ground_level = window::screen_height() - 10.0;
+    let mut ground_level = window::screen_height() - 100.0;
 
     let mut player = Player{x: 100.0, y: ground_level, jump: -1};
     let mut clicked_points = Vec::new();
@@ -109,6 +109,7 @@ async fn main() {
             draw_circle(point.x, point.y, 10.0, RED);
         }
 
+        ground_level = window::screen_height() - 60.0;
         draw_map(map.clone());
 
         draw_texture(texture, player.x, player.y, WHITE);
